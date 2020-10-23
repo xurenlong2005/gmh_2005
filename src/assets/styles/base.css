@@ -36,3 +36,36 @@ input {
 .demo-loginForm .el-form-item__label{
     color: #fff !important;
 }
+.el-menu--collapse .el-submenu__title span {
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    visibility: hidden;
+    display: inline-block;
+}
+
+.el-menu--collapse .el-menu-item .el-submenu__icon-arrow, .el-menu--collapse .el-submenu .el-submenu__title .el-submenu__icon-arrow {
+    display: none;
+}
+
+.el-menu-item-group .el-menu-item {
+    padding: 0 0 0 30px;
+}
+
+.el-menu-item-group .el-menu-item-group__title {
+    padding: 0
+}
+
+#nprogress .bar {
+    background: hotpink !important;
+}
+
+/* log */
+.logo{
+    height: 60px;
+    background: linear-gradient(135deg,#4c67ff,#5635df);
+    background-image: url(./../../media/img1.jpg);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}

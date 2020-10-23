@@ -31,6 +31,7 @@
             type="password"
             v-model="loginForm.password"
             autocomplete="off"
+            @keydown.native.enter="submitForm('loginForm')"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -127,10 +128,10 @@ export default {
                 //更改vuex中state["userInfo"]的值
                 this.SET_USERINFO(res.data.userInfo);
                 //跳转到主页
-                this.$router.push("/");
+                this.$router.push("/Welcome");
               } else {
                 //用户名或者密码错误
-                this.$message.error("错了哦，这是一条错误消息");
+                this.$message.error("用户名或密码错误");
               }
             })
             .catch(err => {

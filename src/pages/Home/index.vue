@@ -2,48 +2,18 @@
   <div class="home-page">
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
-        <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
-          <el-radio-button :label="false">展开</el-radio-button>
-          <el-radio-button :label="true">收起</el-radio-button>
-        </el-radio-group>
+      <el-aside width="200">
+        <h1 class="logo"></h1>
+        <!-- 解决侧边栏展开和收起的问题 -->
         <el-menu
-          default-active="1-4-1"
+          :default-active="$route.path"
           class="el-menu-vertical-demo"
+          :router="true"
           @open="handleOpen"
           @close="handleClose"
           :collapse="isCollapse"
         >
-          <el-submenu index="1">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span slot="title">导航一</span>
-            </template>
-            <el-menu-item-group>
-              <span slot="title">分组一</span>
-              <el-menu-item index="1-1">选项1</el-menu-item>
-              <el-menu-item index="1-2">选项2</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="分组2">
-              <el-menu-item index="1-3">选项3</el-menu-item>
-            </el-menu-item-group>
-            <el-submenu index="1-4">
-              <span slot="title">选项4</span>
-              <el-menu-item index="1-4-1">选项1</el-menu-item>
-            </el-submenu>
-          </el-submenu>
-          <el-menu-item index="2">
-            <i class="el-icon-menu"></i>
-            <span slot="title">导航二</span>
-          </el-menu-item>
-          <el-menu-item index="3" disabled>
-            <i class="el-icon-document"></i>
-            <span slot="title">导航三</span>
-          </el-menu-item>
-          <el-menu-item index="4">
-            <i class="el-icon-setting"></i>
-            <span slot="title">导航四</span>
-          </el-menu-item>
+          <qf-sub-menu :sideMenu="menuList"></qf-sub-menu>
         </el-menu>
       </el-aside>
       <el-container>
@@ -51,10 +21,15 @@
         <el-header>
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="6">
-              <div class="grid-content"></div>
+              <div class="grid-content hh">
+                <i
+                  :class="['iconfont',isCollapse ? 'icon-shouqi1':'icon-shouqi']"
+                  @click="isCollapse=!isCollapse"
+                ></i>
+              </div>
             </el-col>
             <el-col :span="6">
-              <div class="grid-content"></div>
+              <div class="grid-content biaoti">人龙管理系统</div>
             </el-col>
             <el-col :span="6">
               <div class="grid-content">
@@ -65,13 +40,22 @@
                 ></el-avatar>
                 <span>欢迎您:</span>
                 <b class="nickname">{{userInfo.nickname}}</b>
-                <span class="quit" @click="quit">退出</span>
+                <span class="quit iconfont icon-tuichu" @click="quit">退出</span>
               </div>
             </el-col>
           </el-row>
         </el-header>
         <!-- 主体区域 -->
-        <el-main>Main</el-main>
+        <el-main>
+          <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/Welcome' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{path: crumbs.path}" v-for="crumb in crumbs">
+              {{crumb.meta.name}}
+            </el-breadcrumb-item>
+            
+          </el-breadcrumb>
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -82,15 +66,15 @@
 
 <script>
 import { getLoginLog } from "@/api";
-import { mapState } from "vuex"
+import { mapState } from "vuex";
 // vuex中的东西一刷新没有了怎么办，存一份放到本地存储里
 export default {
   computed: {
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo", "menuList","crumbs"])
   },
   data() {
     return {
-      isCollapse: true
+      isCollapse: false
     };
   },
   methods: {
@@ -100,21 +84,21 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    quit(){
+    quit() {
       //退出登入
-      //1.清楚token和userInfo
+      //1.清除token和userInfo
       //2.跳转到登入页
-      localStorage.removeItem("rl2005-token")
-      localStorage.removeItem("rl2005-userInfo")
+      localStorage.removeItem("rl2005-token");
+      localStorage.removeItem("rl2005-userInfo");
 
-      this.$router.push("/login")
+      this.$router.push("/login");
+      //刷新页面
+      window.location.reload();
     }
   },
   mounted() {
     //获取登录日志
-    getLoginLog().then(res => {
-      console.log(res);
-    });
+    
   }
 };
 </script>
@@ -129,7 +113,6 @@ export default {
 }
 
 .el-aside {
-  background-color: #d3dce6;
   color: #333;
   text-align: center;
   line-height: 200px;
@@ -154,11 +137,13 @@ body > .el-container {
 .el-container:nth-child(7) .el-aside {
   line-height: 320px;
 }
-
+/* 侧边栏 */
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 200px;
   min-height: 400px;
 }
+
+
 /* 顶部布局 */
 .el-row {
   margin-bottom: 20px;
@@ -183,18 +168,49 @@ body > .el-container {
   min-height: 36px;
 }
 .row-bg {
+  height: 80px;
+  margin: 0px -21px;
   padding: 10px 0;
-  background-color: #f9fafc;
+  background-color: #fff;
+}
+/* 收起按钮外面的盒子 */
+.hh {
+  position: relative;
+}
+/* 收起按钮 */
+.icon-shouqi,
+.icon-shouqi1 {
+  position: absolute;
+  left: 0px;
+  color: yellowgreen;
+  font-size: 30px;
+  cursor: pointer;
+}
+/*标题 */
+.biaoti {
+  font-weight: 600;
+  font-size: 30px;
+  letter-spacing: 5px;
 }
 /* 头像 */
 .el-avatar {
   vertical-align: middle;
   margin-right: 10px;
 }
+/* 用户名 */
+.nickname {
+  margin-left: 10px;
+}
 /* 退出按钮 */
-.quit{
+.quit {
+  margin-left: 10px;
   cursor: pointer;
   color: yellowgreen;
+  font-size: 25px;
+}
+/* 面包屑 */
+.el-breadcrumb{
+  margin-top: 10px;
 }
 </style>
 

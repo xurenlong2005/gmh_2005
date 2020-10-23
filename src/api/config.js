@@ -7,8 +7,17 @@ axios.defaults.baseURL =
 
 axios.defaults.withCredentials = true; //允许携带认证
 
-//创建请求拦截器，可以给每个请求都携带上想要传递的内容
 
+
+//nprogress进度条
+import NProgress from "nprogress"
+import "nprogress/nprogress.css"
+
+//中断请求属性
+export let CancelToken = axios.CancelToken
+
+
+//创建请求拦截器，可以给每个请求都携带上想要传递的内容
 axios.interceptors.request.use(config => {
   //登入和注册是不需要携带token
   if (config.url == "/users/login") {
@@ -29,7 +38,10 @@ axios.interceptors.response.use(config => {
     // console.log(ElementUI);
     ElementUI.Message.error("登入信息失效，请重新登入");
     //在上面将router引入
+    localStorage.removeItem("rl2005-token")
     router.push("/login");
+    //刷新页面
+    window.location.reload()
   }
   return config;
 });
@@ -37,5 +49,6 @@ axios.interceptors.response.use(config => {
 axios.create({
   timeout: 4000
 });
+
 
 export default axios;
